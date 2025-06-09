@@ -30,8 +30,9 @@ int main(int argc, char *argv[]) {
     shuffle(elements, elementsNumber);
 
     printf("n,b,raw_estimate,estimate\n");
-    for(size_t n = 1; n <= N; n++) {
-        for(size_t b = 4; b <= 16; b += 1) {
+    for(size_t b = 4; b <= 16; b += 1) {
+        size_t elementsCounter = 0;
+        for(size_t n = 1; n <= N; n++) {
             HyperLogLog* hll = initializeHyperloglog(b);
             if (!hll) {
                 fprintf(stderr, "Failed to initialize HyperLogLog with b=%zu\n", b);
@@ -40,7 +41,8 @@ int main(int argc, char *argv[]) {
             }
 
             for(size_t i = 0; i < n; i++) {
-                updateHyperloglog(hll, elements[i]);
+                updateHyperloglog(hll, elements[elementsCounter]);
+                elementsCounter++;
             }
 
             double rawEstimate = estimateRaw(hll);

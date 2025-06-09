@@ -73,7 +73,8 @@ void updateHyperloglog(HyperLogLog* hll, size_t index) {
     uint32_t hash = fnv32Hash(index);
     size_t registerIndex = hash & (hll->m - 1);
     size_t w = hash >> hll->b;
-    size_t rho = __builtin_clz(w) + 1;
+
+    size_t rho = __builtin_clz(w) - hll->b + 1;
 
     hll->registers[registerIndex] = fmax(hll->registers[registerIndex], rho);
 }
@@ -89,7 +90,7 @@ double estimateRaw(HyperLogLog* hll) {
         sum += pow(2.0, -(double)hll->registers[i]);
     }
 
-    return hll->alpha * hll->m * hll->m * (1.0 / sum);
+    return hll->alpha * hll->m * hll->m / sum;
 }
 
 double estimate(HyperLogLog* hll) {
